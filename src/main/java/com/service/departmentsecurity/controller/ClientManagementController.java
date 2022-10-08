@@ -3,13 +3,13 @@ package com.service.departmentsecurity.controller;
 import com.service.departmentsecurity.entity.Client;
 import com.service.departmentsecurity.event.RegistrationCompleteEvent;
 import com.service.departmentsecurity.model.ClientModel;
+import com.service.departmentsecurity.repository.ClientRepository;
 import com.service.departmentsecurity.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,17 +23,13 @@ public class ClientManagementController {
     @Autowired
     private ApplicationEventPublisher publisher;
 
-    private static final List<Client> CLIENTS = Arrays.asList(
-            new Client("Rafael", "Kauati", "rafaelkauati@ua.pt"),
-            new Client("Daniel", "Madureira", "DaniMadu@ua.pt"),
-            new Client("Liliana", "Ribeiro", "Lily@ua.pt")
-    );
+    @Autowired
+    private ClientRepository clientRepository;
 
+    public ClientManagementController(ClientRepository clientRepository) {this.clientRepository = clientRepository;}
 
     @GetMapping("/all")
-    public List<Client> getAllClients(){
-        return CLIENTS;
-    }
+    public List<Client> getAllClients(){return clientRepository.findAll();}
 
     @PostMapping("/register")
     public String registerClient(@RequestBody ClientModel clientModel, final HttpServletRequest request){
