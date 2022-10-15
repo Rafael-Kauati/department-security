@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 @Service
 public class ClientServiceImpl implements ClientService{
@@ -36,6 +40,43 @@ public class ClientServiceImpl implements ClientService{
         clientRepository.save(client);
 
         return client;
+    }
+
+
+    public List<Client> getAllClient(){return clientRepository.findAll();}
+
+    public void deleteByFstName(String fstname){
+
+        List<Client> CLIENTS = getAllClient();
+
+        Client clientMatched = null;
+
+        for(Client c : CLIENTS){
+            if(c.getFstName().equals(fstname)){
+                //clientMatched = c;
+                clientRepository.delete(c);
+            }
+        }
+
+    }
+
+    public List<Client> findAllById(Long id) {
+        return clientRepository.findAllById(Collections.singleton(id));
+    }
+
+    public Client findByFstName(String fstname){
+        final List<Client> CLIENTS = clientRepository.findAll();
+
+        Client clientMatched = null;
+
+        for(Client c :  CLIENTS){
+            if(c.getFstName().equals(fstname)){
+                clientMatched = c;
+            }
+        }
+
+        return clientMatched;
+
     }
 
     @Override

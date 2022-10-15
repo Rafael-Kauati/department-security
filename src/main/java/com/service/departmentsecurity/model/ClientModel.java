@@ -1,12 +1,12 @@
 package com.service.departmentsecurity.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class ClientModel {
     private Long id;
     private String FstName;

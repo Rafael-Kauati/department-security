@@ -1,9 +1,12 @@
 package com.service.departmentsecurity.config;
 
+import com.service.departmentsecurity.config.Roles_n_Permissions.ApplicationUserPermission;
 import com.service.departmentsecurity.config.Roles_n_Permissions.ApplicationUserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,9 +16,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder PasswordEncoder;
@@ -34,35 +39,18 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
-                .csrf().disable() //shall come back later to enable de csrf config, after solving the httpServerlet problem
                 .authorizeRequests()
                 .antMatchers(WHITE_LIST_URLS) .permitAll()
-                .antMatchers("/management/**") .hasRole(ApplicationUserRoles.EMPLOYEE.name())
                 .anyRequest()
                 .authenticated()
                 .and()
+                //Here goes the Defaults XSRF-TOKEN as cookie name and X-XSRF-TOKEN as header name
+                //Relevant note : On a level of api testing ( in my case im using postman ) i will disable ( comment ) the csrf token config
+                //but in a real functional and security microservice context , this configuration should be always enabled  -->
+                //.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .httpBasic();
     }
 
-    // im using these only for testing
-    @Override
-    @Bean
-    protected UserDetailsService userDetailsService(){
-       UserDetails client =  User.builder()
-                .username("WW")
-               .password(PasswordEncoder.encode ("cock"))
-                .roles(ApplicationUserRoles.CLIENT.name())
-                .build();
 
-       UserDetails torres =   User.builder()
-               .username("babau")
-               .password( PasswordEncoder.encode ("euler"))
-               .roles(ApplicationUserRoles.EMPLOYEE.name())
-               .build();
-        return new InMemoryUserDetailsManager(
-                client,
-                torres
-        );
-    }
 
 }
